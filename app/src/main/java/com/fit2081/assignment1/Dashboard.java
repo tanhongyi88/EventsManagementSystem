@@ -63,13 +63,15 @@ public class Dashboard extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.option_refresh) {
+        int id = item.getItemId();
+
+        if (id== R.id.option_refresh) {
             Toast.makeText(this, "Hello1", Toast.LENGTH_SHORT).show();
-        } else if (item.getItemId() == R.id.option_clear_event_form) {
+        } else if (id == R.id.option_clear_event_form) {
             Toast.makeText(this, "Hello2", Toast.LENGTH_SHORT).show();
-        } else if (item.getItemId() == R.id.option_delete_categories) {
+        } else if (id == R.id.option_delete_categories) {
             Toast.makeText(this, "Hello3", Toast.LENGTH_SHORT).show();
-        } else if (item.getItemId() == R.id.option_delete_events) {
+        } else if (id == R.id.option_delete_events) {
             Toast.makeText(this, "Hello4", Toast.LENGTH_SHORT).show();
         } else {
             super.onOptionsItemSelected(item);
@@ -84,12 +86,17 @@ public class Dashboard extends AppCompatActivity {
             // get the id of the selected item
             int id = item.getItemId();
 
-            if (id == 0) {
-                // Do something
+            if (id == R.id.nav_logout) {
+                Snackbar.make(toolbar, "Logout navigation view", Snackbar.LENGTH_SHORT).show();
+                Intent signUpIntent = new Intent(getApplicationContext(), SignUp.class);
+                startActivity(signUpIntent);
+                finish(); // remove activity from stack
             } else if (id == 1) {
                 // Do something
+            } else {
+
             }
-            Snackbar.make(toolbar, "This is from navigation view", Snackbar.LENGTH_SHORT).show();
+
             // close the drawer
             drawer.closeDrawers();
             // tell the OS
