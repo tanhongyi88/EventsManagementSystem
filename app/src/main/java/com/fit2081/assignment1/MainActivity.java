@@ -64,4 +64,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(signUpIntent);
         finish();
     }
+
+    public void back() {
+        super.onBackPressed();
+    }
 }
