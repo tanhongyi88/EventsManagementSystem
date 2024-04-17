@@ -14,11 +14,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 public class Dashboard extends AppCompatActivity {
     Toolbar toolbar;
+    FloatingActionButton fab;
     DrawerLayout drawer;
     NavigationView navigationView;
     Button goToNewCateBtn;
@@ -29,6 +31,7 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.dashboard_drawer);
 
         toolbar = findViewById(R.id.dashboard_toolbar);
+        fab = findViewById(R.id.dashboard_fab);
         drawer = findViewById(R.id.dashboard_drawer);
         navigationView = findViewById(R.id.dashboard_nav_view);
         goToNewCateBtn = findViewById(R.id.goToNewCategoryBtn);
@@ -41,6 +44,21 @@ public class Dashboard extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(new MyNavigationListener());
+
+        // set up floating action button, another way to assign method to a button
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Hello, I am floating action button", Snackbar.LENGTH_SHORT)
+                        .setAction("Undo", (new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Toast.makeText(Dashboard.this, "I am undoing...", Toast.LENGTH_SHORT).show();
+                            }
+                        }))
+                        .show();
+            }
+        });
     }
 
     public void onGoToNewCategoryClick(View view) {
