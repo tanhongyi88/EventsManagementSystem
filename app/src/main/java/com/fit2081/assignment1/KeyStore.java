@@ -7,12 +7,14 @@ public class KeyStore {
     public static String KEY_PASSWORD = "KEY_PASSWORD";
     // Category=========================================================
     public static String CATEGORY_FILE = "CATEGORY_FILE";
+    public static String CATEGORY_LIST = "CATEGORY_LIST";
     public static String CATEGORY_ID = "CATEGORY_ID";
     public static String CATEGORY_NAME = "CATEGORY_NAME";
     public static String CATEGORY_EVENT_COUNT = "CATEGORY_EVENT_COUNT";
     public static String IS_CATEGORY_ACTIVE = "IS_CATEGORY_ACTIVE";
     // Event=============================================================
     public static String EVENT_FILE = "EVENT_FILE";
+    public static String EVENT_LIST = "EVENT_LIST";
     public static String EVENT_ID = "EVENT_ID";
     public static String EVENT_CATEGORY_ID = "EVENT_CATEGORY_ID";
     public static String EVENT_NAME = "EVENT_NAME";
