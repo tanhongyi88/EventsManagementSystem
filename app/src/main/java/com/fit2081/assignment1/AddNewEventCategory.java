@@ -15,6 +15,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
@@ -78,25 +83,32 @@ public class AddNewEventCategory extends AppCompatActivity {
         if (localCateName.isEmpty()) {
             Toast.makeText(this, "Please enter category name", Toast.LENGTH_SHORT).show();
             return;
-        } else if (!localEventCount.isEmpty() && Integer.parseInt(localEventCount) <= 0) {
+        } else if (!localEventCount.isEmpty() && Integer.parseInt(localEventCount) < 0) {
             Toast.makeText(this, "Event count cannot be smaller than 0", Toast.LENGTH_SHORT).show();
             return;
         }
         String localCategoryId = generateCategoryId();
+
+        // SAVE INTO SHARED PREFERENCES WITH EXISTING DATA
+        // get category list from shared preferences
         SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+        Log.d("onSaveCategoryClick", "categoryListRestoredString: " + categoryListRestoredString);
+        // parse into java objects to add a new category
+        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+        Gson gson = new Gson();
+        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
+        categoryListRestored.add(new Category(localCategoryId, localCateName, Integer.parseInt(localEventCount), localIsActive));
+
+        // parse back into string to save into the preferences
+        String newCategoryListString = gson.toJson(categoryListRestored);
+        Log.d("onSaveCategoryClick", "newCategoryListString: " + newCategoryListString);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(KeyStore.CATEGORY_ID, localCategoryId);
-        editor.putString(KeyStore.CATEGORY_NAME, localCateName);
-        if (localEventCount.isEmpty()) {
-            editor.putInt(KeyStore.CATEGORY_EVENT_COUNT, -1);
-        } else {
-            editor.putInt(KeyStore.CATEGORY_EVENT_COUNT, Integer.parseInt(localEventCount));
-        }
-        editor.putBoolean(KeyStore.IS_CATEGORY_ACTIVE, localIsActive);
+        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
         editor.apply();
         Toast.makeText(this, String.format("Category saved: %s", localCategoryId), Toast.LENGTH_SHORT).show();
-
-        categoryId.setText(localCategoryId);
+        // go back to dashboard
+        finish();
     }
 
     private String generateCategoryId() {
