@@ -44,4 +44,14 @@ public class Category {
     public void setActive(boolean active) {
         isActive = active;
     }
+
+    @Override
+    public String toString() {
+        return "Category{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", eventCount=" + eventCount +
+                ", isActive=" + isActive +
+                '}';
+    }
 }
