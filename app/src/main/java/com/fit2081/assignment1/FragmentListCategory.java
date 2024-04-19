@@ -1,5 +1,7 @@
 package com.fit2081.assignment1;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 /**
@@ -30,9 +36,10 @@ public class FragmentListCategory extends Fragment {
 
     // recycler view
     ArrayList<Category> listCategory = new ArrayList<>();
-    RecyclerAdapterCategory recyclerAdapter;
-    private RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
+    RecyclerAdapterCategory categoryRecyclerAdapter;
+    private RecyclerView categoryRecyclerView;
+    RecyclerView.LayoutManager categoryLayoutManager;
+    Gson gson = new Gson();
 
     public FragmentListCategory() {
         // Required empty public constructor
@@ -72,19 +79,21 @@ public class FragmentListCategory extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_category, container, false);
 
         // set up recycler view in the fragment
-        recyclerView = view.findViewById(R.id.categoryListRecycler);
-        layoutManager = new LinearLayoutManager(view.getContext());  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
-        recyclerView.setLayoutManager(layoutManager);          // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
-        recyclerAdapter = new RecyclerAdapterCategory();
-        recyclerAdapter.setCategoryList(listCategory);
-        recyclerView.setAdapter(recyclerAdapter);
+        categoryRecyclerView = view.findViewById(R.id.categoryListRecycler);
+        categoryLayoutManager = new LinearLayoutManager(view.getContext());  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
+        categoryRecyclerView.setLayoutManager(categoryLayoutManager);          // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
+        categoryRecyclerAdapter = new RecyclerAdapterCategory();
+        categoryRecyclerView.setAdapter(categoryRecyclerAdapter);
+        getCategoryListFromPref(view);
 
         return view;
     }
-
-    private void addCategoryToRecyclerView(Category newCategory) {
-
-        listCategory.add(newCategory);
-        recyclerAdapter.notifyDataSetChanged();
+    private void getCategoryListFromPref(View view) {
+        SharedPreferences sharedPref = view.getContext().getSharedPreferences(KeyStore.CATEGORY_FILE, Context.MODE_PRIVATE);
+        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+        listCategory = gson.fromJson(categoryListRestoredString, type);
+        categoryRecyclerAdapter.setCategoryList(listCategory);
+        categoryRecyclerAdapter.notifyDataSetChanged();
     }
 }
