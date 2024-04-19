@@ -31,13 +31,13 @@ public class RecyclerAdapterCategory extends RecyclerView.Adapter<RecyclerAdapte
     public void onBindViewHolder(@NonNull CategoryItemViewHolder holder, int position) {
         holder.idView.setText(categoryList.get(position).getId());
         holder.nameView.setText(categoryList.get(position).getName());
-        holder.eventCountView.setText(categoryList.get(position).getEventCount());
+        holder.eventCountView.setText(String.valueOf(categoryList.get(position).getEventCount()));
         holder.isActiveView.setText(categoryList.get(position).isActive() ? "Active" : "Inactive");
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return categoryList.size();
     }
 
     public class CategoryItemViewHolder extends RecyclerView.ViewHolder {
