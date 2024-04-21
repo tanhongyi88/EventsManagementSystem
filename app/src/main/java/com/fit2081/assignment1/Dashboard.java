@@ -11,15 +11,24 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Dashboard extends AppCompatActivity {
     Toolbar toolbar;
@@ -28,8 +37,13 @@ public class Dashboard extends AppCompatActivity {
     NavigationView navigationView;
     FragmentManager dashboardFragManager;
     FragmentListCategory categoryFrag;
-    Button goToNewCateBtn;
-    Button goToNewEventBtn;
+    EditText eventIdView;
+    EditText eventNameView;
+    EditText categoryIdView;
+    EditText ticketsView;
+    Switch isActiveView;
+    Gson gson = new Gson();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,8 +53,12 @@ public class Dashboard extends AppCompatActivity {
         fab = findViewById(R.id.dashboard_fab);
         drawer = findViewById(R.id.dashboard_drawer);
         navigationView = findViewById(R.id.dashboard_nav_view);
-//        goToNewCateBtn = findViewById(R.id.goToNewCategoryBtn);
-//        goToNewEventBtn = findViewById(R.id.goToNewEventBtn);
+        eventIdView = findViewById(R.id.dashboard_event_id_input);
+        eventNameView = findViewById(R.id.dashboard_event_name_input);
+        categoryIdView = findViewById(R.id.dashboard_event_category_id_input);
+        ticketsView = findViewById(R.id.dashboard_event_tickets_input);
+        isActiveView = findViewById(R.id.dashboard_event_is_active_input);
+
 
         // set up toolbar and then drawer, nav view
         setSupportActionBar(toolbar);
@@ -57,28 +75,112 @@ public class Dashboard extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Hello, I am floating action button", Snackbar.LENGTH_SHORT)
-                        .setAction("Undo", (new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Toast.makeText(Dashboard.this, "I am undoing...", Toast.LENGTH_SHORT).show();
-                            }
-                        }))
-                        .show();
+                if (isEventFormValid()) {
+                    addNewEvent();
+                    Snackbar.make(view, "New event saved", Snackbar.LENGTH_LONG)
+                            .setAction("Undo", (new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                }
+                            }))
+                            .show();
+                }
             }
         });
     }
 
-    public void onGoToNewCategoryClick(View view) {
-        Intent goToNewCategoryIntent = new Intent(this, AddNewEventCategory.class);
-        startActivity(goToNewCategoryIntent);
-        finish();
+    private void undoNewEvent() {
+
     }
 
-    public void onGoToNewEventClick(View view) {
-        Intent goToNewEventIntent = new Intent(this, AddNewEvent.class);
-        startActivity(goToNewEventIntent);
-        finish();
+    private void addNewEvent() {
+        // get input field values
+        String eventNameInput = eventNameView.getText().toString();
+        String categoryIdInput = categoryIdView.getText().toString();
+        int ticketsInput = ticketsView.getText().toString().isEmpty() ? 0 : Integer.parseInt(ticketsView.getText().toString());
+        boolean isActiveInput = isActiveView.isChecked();
+        String eventId = generateEventId();
+
+        // SAVE INTO SHARED PREFERENCES WITH EXISTING DATA
+        // get event list from shared preferences
+        SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
+        String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
+        // parse into java objects to add a new event
+        Type type = new TypeToken<ArrayList<Event>>() {}.getType();
+        ArrayList<Event> eventListRestored = gson.fromJson(eventListRestoredString,type);
+        eventListRestored.add(new Event(eventId, eventNameInput, categoryIdInput, ticketsInput, isActiveInput));
+
+        // parse back into string to save into the preferences
+        String newEventListString = gson.toJson(eventListRestored);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(KeyStore.EVENT_LIST, newEventListString);
+        editor.apply();
+
+        // populate the event ID
+        eventIdView.setText(eventId);
+    }
+
+    private boolean isEventFormValid() {
+        // validate event name
+        String eventNameInput = eventNameView.getText().toString();
+        if (!isEventNameValid(eventNameInput)) {
+            Toast.makeText(this, "Invalid event name", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        // validate category id
+        String categoryIdInput = categoryIdView.getText().toString();
+        if (!isCategoryIdInputValid(categoryIdInput)) {
+            Toast.makeText(this, "Invalid category id", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isEventNameValid(String eventNameInput) {
+        String[] eventNameInputArray = eventNameInput.split("\\s+");
+        boolean isValid = true;
+
+        // rule 1: no characters other than alpha-numeric
+        for (String s: eventNameInputArray) {
+            if (!s.matches("[a-zA-Z0-9]+")) {
+                isValid = false;
+            }
+        }
+        // rule 2: if length == 1 and the string is made up of only numeric => Invalid
+        if (eventNameInputArray.length == 1 && eventNameInputArray[0].matches("[0-9]+")) {
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    private boolean isCategoryIdInputValid(String categoryIdInput) {
+        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+        ArrayList<Category> categoryList = gson.fromJson(categoryListRestoredString, type);
+
+        for (Category c: categoryList) {
+            if (c.getId().equals(categoryIdInput)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String generateEventId() {
+        String[] alphabets = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+                "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+        int num = (int) Math.round(Math.random() * 100) % 26;
+        int num2 = (int) Math.round(Math.random() * 100) % 26;
+        StringBuilder res = new StringBuilder(String.format("%s%s%s-", "E", alphabets[num], alphabets[num2]));
+        for (int i = 0; i < 5; i++) {
+            long num3 = Math.round(Math.random() * 100) % 10;
+            res.append(num3);
+        }
+
+        return String.valueOf(res);
     }
 
     @Override
@@ -128,13 +230,16 @@ public class Dashboard extends AppCompatActivity {
             // get the id of the selected item
             int id = item.getItemId();
 
-            if (id == R.id.nav_add_category) {
-                Intent goToNewCategoryIntent = new Intent(getApplicationContext(), AddNewEventCategory.class);
-                startActivity(goToNewCategoryIntent);
-            } else if ( id == R.id.nav_view_categories) {
+            if ( id == R.id.nav_view_categories) {
                 Intent viewCategoriesIntent = new Intent(getApplicationContext(), ListCategoryActivity.class);
                 startActivity(viewCategoriesIntent);
-            } else if (id == R.id.nav_logout) {
+            } else if (id == R.id.nav_add_category) {
+                Intent goToNewCategoryIntent = new Intent(getApplicationContext(), AddNewEventCategory.class);
+                startActivity(goToNewCategoryIntent);
+            } else if (id == R.id.nav_view_events) {
+                Intent viewEventsIntent = new Intent(getApplicationContext(), ListEventActivity.class);
+                startActivity(viewEventsIntent);
+            } else {
                 Intent signUpIntent = new Intent(getApplicationContext(), SignUp.class);
                 startActivity(signUpIntent);
                 finish(); // remove activity from stack
