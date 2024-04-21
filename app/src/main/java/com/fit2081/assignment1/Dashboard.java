@@ -76,12 +76,14 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isEventFormValid()) {
-                    String newEventId = addNewEvent();
+                    Event newEvent = addNewEvent();
+                    incrementEventCount(newEvent);
                     Snackbar.make(view, "New event saved", Snackbar.LENGTH_LONG)
                             .setAction("Undo", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    undoNewEvent(newEventId);
+                                    undoNewEvent(newEvent);
+                                    decrementEventCount(newEvent);
                                     Toast.makeText(Dashboard.this, "Undo successfully", Toast.LENGTH_SHORT).show();
                                 }
                             })
@@ -91,7 +93,25 @@ public class Dashboard extends AppCompatActivity {
         });
     }
 
-    private void undoNewEvent(String newEventId) {
+    private void decrementEventCount(Event eventAdded) {
+        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
+        for (Category c: categoryListRestored) {
+            if (c.getId().equals(eventAdded.getCategoryId())) {
+                c.decrementEventCount();
+                break;
+            }
+        }
+
+        String newCategoryListString = gson.toJson(categoryListRestored);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
+        editor.apply();
+    }
+
+    private void undoNewEvent(Event newEventId) {
         SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
         String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
         Type type = new TypeToken<ArrayList<Event>>() {}.getType();
@@ -104,7 +124,25 @@ public class Dashboard extends AppCompatActivity {
         editor.apply();
     }
 
-    private String addNewEvent() {
+    private void incrementEventCount(Event eventAdded) {
+        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
+        for (Category c: categoryListRestored) {
+            if (c.getId().equals(eventAdded.getCategoryId())) {
+                c.incrementEventCount();
+                break;
+            }
+        }
+
+        String newCategoryListString = gson.toJson(categoryListRestored);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
+        editor.apply();
+    }
+
+    private Event addNewEvent() {
         // get input field values
         String eventNameInput = eventNameView.getText().toString();
         String categoryIdInput = categoryIdView.getText().toString();
@@ -119,7 +157,8 @@ public class Dashboard extends AppCompatActivity {
         // parse into java objects to add a new event
         Type type = new TypeToken<ArrayList<Event>>() {}.getType();
         ArrayList<Event> eventListRestored = gson.fromJson(eventListRestoredString,type);
-        eventListRestored.add(new Event(eventId, eventNameInput, categoryIdInput, ticketsInput, isActiveInput));
+        Event newEvent = new Event(eventId, eventNameInput, categoryIdInput, ticketsInput, isActiveInput);
+        eventListRestored.add(newEvent);
 
         // parse back into string to save into the preferences
         String newEventListString = gson.toJson(eventListRestored);
@@ -130,7 +169,7 @@ public class Dashboard extends AppCompatActivity {
         // populate the event ID
         eventIdView.setText(eventId);
 
-        return eventId;
+        return newEvent;
     }
 
     private boolean isEventFormValid() {
@@ -143,7 +182,7 @@ public class Dashboard extends AppCompatActivity {
         // validate category id
         String categoryIdInput = categoryIdView.getText().toString();
         if (!isCategoryIdInputValid(categoryIdInput)) {
-            Toast.makeText(this, "Invalid category id", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Category does not exist", Toast.LENGTH_SHORT).show();
             return false;
         }
 

@@ -45,6 +45,13 @@ public class Category {
         isActive = active;
     }
 
+    public void incrementEventCount() {
+        this.eventCount += 1;
+    }
+    public void decrementEventCount() {
+        this.eventCount -= 1;
+    }
+
     @Override
     public String toString() {
         return "Category{" +
