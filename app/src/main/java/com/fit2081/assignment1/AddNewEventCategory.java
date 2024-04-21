@@ -83,9 +83,6 @@ public class AddNewEventCategory extends AppCompatActivity {
         if (localCateName.isEmpty()) {
             Toast.makeText(this, "Please enter category name", Toast.LENGTH_SHORT).show();
             return;
-        } else if (!localEventCount.isEmpty() && Integer.parseInt(localEventCount) < 0) {
-            Toast.makeText(this, "Event count cannot be smaller than 0", Toast.LENGTH_SHORT).show();
-            return;
         }
         String localCategoryId = generateCategoryId();
 
@@ -98,7 +95,8 @@ public class AddNewEventCategory extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<Category>>() {}.getType();
         Gson gson = new Gson();
         ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
-        categoryListRestored.add(new Category(localCategoryId, localCateName, Integer.parseInt(localEventCount), localIsActive));
+        categoryListRestored.add(new Category(localCategoryId, localCateName,
+                localEventCount.isEmpty() ? 0 : Integer.parseInt(localEventCount), localIsActive));
 
         // parse back into string to save into the preferences
         String newCategoryListString = gson.toJson(categoryListRestored);
