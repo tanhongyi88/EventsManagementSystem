@@ -32,6 +32,7 @@ public class RecyclerAdapterEvent extends RecyclerView.Adapter<RecyclerAdapterEv
         holder.nameView.setText(eventList.get(position).getName());
         holder.categoryIdView.setText(eventList.get(position).getCategoryId());
         holder.ticketsView.setText(String.valueOf(eventList.get(position).getTicketsAvailable()));
+        holder.isActive.setText(eventList.get(position).isActive() ? "Active" : "Inactive");
     }
 
     @Override

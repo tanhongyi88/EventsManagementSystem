@@ -1,5 +1,7 @@
 package com.fit2081.assignment1;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 /**
@@ -28,9 +34,10 @@ public class FragmentListEvent extends Fragment {
     private String mParam1;
     private String mParam2;
     ArrayList<Event> listEvent = new ArrayList<>();
-    RecyclerAdapterEvent recyclerAdapter;
-    private RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
+    RecyclerAdapterEvent eventRecyclerAdapter;
+    private RecyclerView eventRecyclerView;
+    RecyclerView.LayoutManager eventLayoutManager;
+    Gson gson = new Gson();
 
     public FragmentListEvent() {
         // Required empty public constructor
@@ -69,18 +76,21 @@ public class FragmentListEvent extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_list_event, container, false);
         // set up recycler view in the fragment
-        recyclerView = view.findViewById(R.id.eventListRecycler);
-        layoutManager = new LinearLayoutManager(view.getContext());  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
-        recyclerView.setLayoutManager(layoutManager);          // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
-        recyclerAdapter = new RecyclerAdapterEvent();
-        recyclerAdapter.setEventList(listEvent);
-        recyclerView.setAdapter(recyclerAdapter);
+        eventRecyclerView = view.findViewById(R.id.eventListRecycler);
+        eventLayoutManager = new LinearLayoutManager(view.getContext());  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
+        eventRecyclerView.setLayoutManager(eventLayoutManager);          // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
+        eventRecyclerAdapter = new RecyclerAdapterEvent();
+        eventRecyclerView.setAdapter(eventRecyclerAdapter);
+        getEventListFromPref(view);
         return view;
     }
 
-    private void addEventToRecyclerView(Event newEvent) {
-
-        listEvent.add(newEvent);
-        recyclerAdapter.notifyDataSetChanged();
+    private void getEventListFromPref(View view) {
+        SharedPreferences sharedPref = view.getContext().getSharedPreferences(KeyStore.EVENT_FILE, Context.MODE_PRIVATE);
+        String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
+        Type type = new TypeToken<ArrayList<Event>>() {}.getType();
+        listEvent = gson.fromJson(eventListRestoredString, type);
+        eventRecyclerAdapter.setEventList(listEvent);
+        eventRecyclerAdapter.notifyDataSetChanged();
     }
 }
