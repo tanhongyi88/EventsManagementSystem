@@ -76,25 +76,35 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isEventFormValid()) {
-                    addNewEvent();
+                    String newEventId = addNewEvent();
                     Snackbar.make(view, "New event saved", Snackbar.LENGTH_LONG)
-                            .setAction("Undo", (new View.OnClickListener() {
+                            .setAction("Undo", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-
+                                    undoNewEvent(newEventId);
+                                    Toast.makeText(Dashboard.this, "Undo successfully", Toast.LENGTH_SHORT).show();
                                 }
-                            }))
+                            })
                             .show();
                 }
             }
         });
     }
 
-    private void undoNewEvent() {
+    private void undoNewEvent(String newEventId) {
+        SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
+        String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
+        Type type = new TypeToken<ArrayList<Event>>() {}.getType();
+        ArrayList<Event> eventListRestored = gson.fromJson(eventListRestoredString,type);
+        eventListRestored.remove(eventListRestored.size()-1);
 
+        String newEventListString = gson.toJson(eventListRestored);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(KeyStore.EVENT_LIST, newEventListString);
+        editor.apply();
     }
 
-    private void addNewEvent() {
+    private String addNewEvent() {
         // get input field values
         String eventNameInput = eventNameView.getText().toString();
         String categoryIdInput = categoryIdView.getText().toString();
@@ -119,6 +129,8 @@ public class Dashboard extends AppCompatActivity {
 
         // populate the event ID
         eventIdView.setText(eventId);
+
+        return eventId;
     }
 
     private boolean isEventFormValid() {
