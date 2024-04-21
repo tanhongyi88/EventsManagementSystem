@@ -200,7 +200,11 @@ public class Dashboard extends AppCompatActivity {
             fragmentTransaction.addToBackStack("dashboard_stack");
             fragmentTransaction.commit();
         } else if (id == R.id.option_clear_event_form) {
-            Toast.makeText(this, "Hello2", Toast.LENGTH_SHORT).show();
+            eventIdView.setText("");
+            eventNameView.setText("");
+            categoryIdView.setText("");
+            ticketsView.setText("");
+            isActiveView.setChecked(false);
         } else if (id == R.id.option_delete_categories) {
             // delete from shared preferences
             SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
@@ -216,7 +220,11 @@ public class Dashboard extends AppCompatActivity {
             fragmentTransaction.addToBackStack("dashboard_stack");
             fragmentTransaction.commit();
         } else if (id == R.id.option_delete_events) {
-            Toast.makeText(this, "Hello4", Toast.LENGTH_SHORT).show();
+            SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.remove(KeyStore.EVENT_LIST);
+            editor.apply();
+            Toast.makeText(this, "Events are removed", Toast.LENGTH_SHORT).show();
         } else {
             super.onOptionsItemSelected(item);
         }
