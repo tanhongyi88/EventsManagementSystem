@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fit2081.assignment1.provider.Event;
+
 import java.util.ArrayList;
 
 public class RecyclerAdapterEvent extends RecyclerView.Adapter<RecyclerAdapterEvent.EventItemViewHolder> {

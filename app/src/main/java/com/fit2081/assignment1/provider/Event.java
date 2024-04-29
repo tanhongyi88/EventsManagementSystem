@@ -1,4 +1,4 @@
-package com.fit2081.assignment1;
+package com.fit2081.assignment1.provider;
 
 public class Event {
 

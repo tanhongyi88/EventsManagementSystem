@@ -15,13 +15,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fit2081.assignment1.provider.Category;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.StringTokenizer;
 
 public class AddNewEventCategory extends AppCompatActivity {
 

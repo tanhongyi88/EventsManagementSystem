@@ -1,6 +1,5 @@
 package com.fit2081.assignment1;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.fit2081.assignment1.provider.Category;
 
 import java.util.ArrayList;
 

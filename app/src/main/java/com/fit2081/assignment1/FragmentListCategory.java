@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fit2081.assignment1.provider.Category;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
