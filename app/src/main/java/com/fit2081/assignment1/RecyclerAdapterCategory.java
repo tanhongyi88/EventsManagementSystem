@@ -30,7 +30,7 @@ public class RecyclerAdapterCategory extends RecyclerView.Adapter<RecyclerAdapte
 
     @Override
     public void onBindViewHolder(@NonNull CategoryItemViewHolder holder, int position) {
-        holder.idView.setText(categoryList.get(position).getId());
+        holder.idView.setText(categoryList.get(position).getCategoryId());
         holder.nameView.setText(categoryList.get(position).getName());
         holder.eventCountView.setText(String.valueOf(categoryList.get(position).getEventCount()));
         holder.isActiveView.setText(categoryList.get(position).isActive() ? "Active" : "Inactive");

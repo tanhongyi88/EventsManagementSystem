@@ -2,6 +2,7 @@ package com.fit2081.assignment1;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fit2081.assignment1.provider.Category;
+import com.fit2081.assignment1.provider.CategoryViewModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,7 +30,10 @@ public class AddNewEventCategory extends AppCompatActivity {
     TextView categoryName;
     TextView eventCount;
     Switch isActive;
+    TextView categoryLocation;
     MyBroadCastReceiver myBroadCastReceiver;
+
+    private CategoryViewModel mCategoryViewModel;
 
     private final int NUM_OPTIONAL_INPUT = 2;
 
@@ -41,12 +46,15 @@ public class AddNewEventCategory extends AppCompatActivity {
         categoryName = findViewById(R.id.categoryNameInput);
         eventCount = findViewById(R.id.eventCountInput);
         isActive = findViewById(R.id.isActiveCategory);
+        categoryLocation = findViewById(R.id.categoryLocationInput);
 
         ActivityCompat.requestPermissions(this, new String[]{
                 android.Manifest.permission.SEND_SMS,
                 android.Manifest.permission.RECEIVE_SMS,
                 android.Manifest.permission.READ_SMS
         }, 0);
+
+        mCategoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
     }
 
     @Override
@@ -75,16 +83,41 @@ public class AddNewEventCategory extends AppCompatActivity {
     }
 
     public void onSaveCategoryClick(View view) {
+        if (isCategoryFormValid()) {
+            String categoryIdSaved = addNewCategory();
+            Toast.makeText(this, String.format("Category saved: %s", categoryIdSaved), Toast.LENGTH_SHORT).show();
+            // go back to dashboard
+            finish();
+        }
+    }
+
+    private String addNewCategory() {
+        String localCategoryId = generateCategoryId();
+        String localCateName = categoryName.getText().toString();
+        int localEventCount = eventCount.getText().toString().isEmpty() ? 0 : Integer.parseInt(eventCount.getText().toString());
+        boolean localIsActive = isActive.isChecked();
+        String localLocation = categoryLocation.getText().toString();
+        mCategoryViewModel.insert(new Category(localCategoryId, localCateName, localEventCount,localIsActive,localLocation));
+        return localCategoryId;
+    }
+
+    private boolean isCategoryFormValid() {
         String localCateName = categoryName.getText().toString();
         String localEventCount = eventCount.getText().toString();
         boolean localIsActive = isActive.isChecked();
+        String localLocation = categoryLocation.getText().toString();
 
         if (localCateName.isEmpty()) {
             Toast.makeText(this, "Please enter category name", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
-        String localCategoryId = generateCategoryId();
+        return true;
+    }
 
+    /**
+     * Deprecated saving method. Room database is the new saving method
+     */
+    private void saveToSharedPreferences(String localCategoryId, String localCateName, String localEventCount, boolean localIsActive) {
         // SAVE INTO SHARED PREFERENCES WITH EXISTING DATA
         // get category list from shared preferences
         SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
@@ -103,9 +136,6 @@ public class AddNewEventCategory extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
         editor.apply();
-        Toast.makeText(this, String.format("Category saved: %s", localCategoryId), Toast.LENGTH_SHORT).show();
-        // go back to dashboard
-        finish();
     }
 
     private String generateCategoryId() {

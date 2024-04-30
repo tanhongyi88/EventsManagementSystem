@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fit2081.assignment1.provider.Category;
+import com.fit2081.assignment1.provider.CategoryViewModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,6 +36,8 @@ public class FragmentListCategory extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private CategoryViewModel mCategoryViewModel;
 
     // recycler view
     ArrayList<Category> listCategory = new ArrayList<>();
@@ -85,10 +89,25 @@ public class FragmentListCategory extends Fragment {
         categoryRecyclerView.setLayoutManager(categoryLayoutManager);          // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
         categoryRecyclerAdapter = new RecyclerAdapterCategory();
         categoryRecyclerView.setAdapter(categoryRecyclerAdapter);
-        getCategoryListFromPref(view);
+
+        // init view model and get category list data
+        mCategoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+        getCategoryListFromRoomDatabase();
 
         return view;
     }
+
+    private void getCategoryListFromRoomDatabase() {
+        mCategoryViewModel.getAllCategories().observe(getViewLifecycleOwner(), newData -> {
+            categoryRecyclerAdapter.setCategoryList(new ArrayList<>(newData));
+            categoryRecyclerAdapter.notifyDataSetChanged();
+        });
+    }
+
+    /**
+     * Deprecated get from shared preferences because room database is used on behalf
+     * @param view
+     */
     private void getCategoryListFromPref(View view) {
         SharedPreferences sharedPref = view.getContext().getSharedPreferences(KeyStore.CATEGORY_FILE, Context.MODE_PRIVATE);
         String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
