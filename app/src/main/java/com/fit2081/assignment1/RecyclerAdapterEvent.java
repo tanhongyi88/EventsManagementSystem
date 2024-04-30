@@ -30,7 +30,7 @@ public class RecyclerAdapterEvent extends RecyclerView.Adapter<RecyclerAdapterEv
 
     @Override
     public void onBindViewHolder(@NonNull EventItemViewHolder holder, int position) {
-        holder.idView.setText(eventList.get(position).getId());
+        holder.idView.setText(eventList.get(position).getEventId());
         holder.nameView.setText(eventList.get(position).getName());
         holder.categoryIdView.setText(eventList.get(position).getCategoryId());
         holder.ticketsView.setText(String.valueOf(eventList.get(position).getTicketsAvailable()));
