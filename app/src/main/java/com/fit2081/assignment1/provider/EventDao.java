@@ -13,7 +13,7 @@ public interface EventDao {
     LiveData<List<Event>> getAllEvents();
 
     @Query("select * from events where eventId=:eventId")
-    LiveData<List<Event>> getEvent(String eventId);
+    List<Event> getEvent(String eventId);
 
     @Insert
     void addEvent(Event event);

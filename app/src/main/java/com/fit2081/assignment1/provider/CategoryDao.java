@@ -13,7 +13,7 @@ public interface CategoryDao {
     LiveData<List<Category>> getAllCategories();
 
     @Query("select * from categories where categoryId=:categoryId")
-    LiveData<List<Category>> getCategory(String categoryId);
+    List<Category> getCategory(String categoryId);
 
     @Insert
     void addCategory(Category category);
