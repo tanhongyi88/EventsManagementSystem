@@ -98,7 +98,7 @@ public class Dashboard extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<Category>>() {}.getType();
         ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
         for (Category c: categoryListRestored) {
-            if (c.getId().equals(eventAdded.getCategoryId())) {
+            if (c.getCategoryId().equals(eventAdded.getCategoryId())) {
                 c.decrementEventCount();
                 break;
             }
@@ -129,7 +129,7 @@ public class Dashboard extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<Category>>() {}.getType();
         ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
         for (Category c: categoryListRestored) {
-            if (c.getId().equals(eventAdded.getCategoryId())) {
+            if (c.getCategoryId().equals(eventAdded.getCategoryId())) {
                 c.incrementEventCount();
                 break;
             }
@@ -212,7 +212,7 @@ public class Dashboard extends AppCompatActivity {
         ArrayList<Category> categoryList = gson.fromJson(categoryListRestoredString, type);
 
         for (Category c: categoryList) {
-            if (c.getId().equals(categoryIdInput)) {
+            if (c.getCategoryId().equals(categoryIdInput)) {
                 return true;
             }
         }
