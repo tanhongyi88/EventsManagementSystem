@@ -4,6 +4,7 @@ package com.fit2081.assignment1.provider;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "categories")
@@ -20,12 +21,22 @@ public class Category {
     private int eventCount;
     @ColumnInfo(name = "isActive")
     private boolean isActive;
+    @ColumnInfo(name = "eventLocation")
+    private String location;
 
+    @Ignore
     public Category(String categoryId, String name, int eventCount, boolean isActive) {
         this.categoryId = categoryId;
         this.name = name;
         this.eventCount = eventCount;
         this.isActive = isActive;
+    }
+    public Category(String categoryId, String name, int eventCount, boolean isActive, String location) {
+        this.categoryId = categoryId;
+        this.name = name;
+        this.eventCount = eventCount;
+        this.isActive = isActive;
+        this.location = location;
     }
 
     public int getId() {
@@ -66,6 +77,14 @@ public class Category {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public void incrementEventCount() {
