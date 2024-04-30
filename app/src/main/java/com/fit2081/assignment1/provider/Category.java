@@ -6,7 +6,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "category")
+@Entity(tableName = "categories")
 public class Category {
     @PrimaryKey(autoGenerate = true)
     @NonNull

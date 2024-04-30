@@ -5,7 +5,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "event")
+@Entity(tableName = "events")
 public class Event {
     @PrimaryKey(autoGenerate = true)
     @NonNull
