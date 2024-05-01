@@ -18,6 +18,9 @@ public class CategoryRepository {
     LiveData<List<Category>> getAllCategories() {
         return mAllCategories;
     }
+    List<Category> getCategory(String categoryId) {
+        return mCategoryDao.getCategory(categoryId);
+    }
     void insert(Category category) {
         CategoryDatabase.databaseWriteExecutor.execute(() -> mCategoryDao.addCategory(category));
     }
