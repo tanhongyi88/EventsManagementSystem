@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.fit2081.assignment1.provider.Category;
 import com.fit2081.assignment1.provider.CategoryViewModel;
 import com.fit2081.assignment1.provider.Event;
+import com.fit2081.assignment1.provider.EventViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -46,6 +47,7 @@ public class Dashboard extends AppCompatActivity {
     Gson gson = new Gson();
 
     private CategoryViewModel mCategoryViewModel;
+    private EventViewModel mEventViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +76,9 @@ public class Dashboard extends AppCompatActivity {
         // set up category fragment here
         dashboardFragManager = getSupportFragmentManager();
 
-        // set up view model
+        // set up view model for category and event
         mCategoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+        mEventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
 
         // set up floating action button, another way to assign method to a button
         fab.setOnClickListener(new View.OnClickListener() {
@@ -83,13 +86,13 @@ public class Dashboard extends AppCompatActivity {
             public void onClick(View view) {
                 if (isEventFormValid()) {
                     Event newEvent = addNewEvent();
-                    incrementEventCount(newEvent);
+//                    incrementEventCount(newEvent);
                     Snackbar.make(view, "New event saved", Snackbar.LENGTH_LONG)
                             .setAction("Undo", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
                                     undoNewEvent(newEvent);
-                                    decrementEventCount(newEvent);
+//                                    decrementEventCount(newEvent);
                                     Toast.makeText(Dashboard.this, "Undo successfully", Toast.LENGTH_SHORT).show();
                                 }
                             })
@@ -156,6 +159,20 @@ public class Dashboard extends AppCompatActivity {
         boolean isActiveInput = isActiveView.isChecked();
         String eventId = generateEventId();
 
+        // insert into database
+        Event newEvent = new Event(eventId, eventNameInput, categoryIdInput, ticketsInput, isActiveInput);
+        mEventViewModel.insert(newEvent);
+        // populate the event ID
+        eventIdView.setText(eventId);
+
+        return newEvent;
+    }
+
+    /**
+     * Deprecated saving method for event.
+     */
+    @NonNull
+    private Event saveEventIntoSharedPref(String eventId, String eventNameInput, String categoryIdInput, int ticketsInput, boolean isActiveInput) {
         // SAVE INTO SHARED PREFERENCES WITH EXISTING DATA
         // get event list from shared preferences
         SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
@@ -171,10 +188,6 @@ public class Dashboard extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(KeyStore.EVENT_LIST, newEventListString);
         editor.apply();
-
-        // populate the event ID
-        eventIdView.setText(eventId);
-
         return newEvent;
     }
 
@@ -213,17 +226,22 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private boolean isCategoryIdInputValid(String categoryIdInput) {
-        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
-        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
-        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
-        ArrayList<Category> categoryList = gson.fromJson(categoryListRestoredString, type);
+        ArrayList<Category> categoryQueried = new ArrayList<>(mCategoryViewModel.getCategory(categoryIdInput));
+        return !categoryQueried.isEmpty();
+        /**
+         * Deprecated checking method
+         */
+//        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+//        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+//        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+//        ArrayList<Category> categoryList = gson.fromJson(categoryListRestoredString, type);
+//
+//        for (Category c: categoryList) {
+//            if (c.getCategoryId().equals(categoryIdInput)) {
+//                return true;
+//            }
+//        }
 
-        for (Category c: categoryList) {
-            if (c.getCategoryId().equals(categoryIdInput)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private String generateEventId() {
