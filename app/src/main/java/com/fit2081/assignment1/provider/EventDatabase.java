@@ -27,6 +27,7 @@ public abstract class EventDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     EventDatabase.class, EVENT_DATABASE_NAME)
+                            .allowMainThreadQueries()
                             .build();
                 }
             }

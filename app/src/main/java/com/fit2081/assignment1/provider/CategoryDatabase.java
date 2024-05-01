@@ -27,6 +27,7 @@ public abstract class CategoryDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     CategoryDatabase.class, CATEGORY_DATABASE_NAME)
+                            .allowMainThreadQueries()
                             .build();
                 }
             }
