@@ -22,5 +22,5 @@ public interface EventDao {
     void deleteEvent(String eventId);
 
     @Query("delete from events")
-    void deleteAllEvent();
+    void deleteAllEvents();
 }
