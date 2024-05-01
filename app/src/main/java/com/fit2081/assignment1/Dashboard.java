@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.fit2081.assignment1.provider.Category;
+import com.fit2081.assignment1.provider.CategoryViewModel;
 import com.fit2081.assignment1.provider.Event;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -42,6 +44,8 @@ public class Dashboard extends AppCompatActivity {
     EditText ticketsView;
     Switch isActiveView;
     Gson gson = new Gson();
+
+    private CategoryViewModel mCategoryViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,9 @@ public class Dashboard extends AppCompatActivity {
 
         // set up category fragment here
         dashboardFragManager = getSupportFragmentManager();
+
+        // set up view model
+        mCategoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
 
         // set up floating action button, another way to assign method to a button
         fab.setOnClickListener(new View.OnClickListener() {
@@ -256,19 +263,9 @@ public class Dashboard extends AppCompatActivity {
             ticketsView.setText("");
             isActiveView.setChecked(false);
         } else if (id == R.id.option_delete_categories) {
-            // delete from shared preferences
-            SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.remove(KeyStore.CATEGORY_LIST);
-            editor.apply();
-            Toast.makeText(this, "Categories are removed", Toast.LENGTH_SHORT).show();
-
-            // update fragment with new fragment
-            categoryFrag = new FragmentListCategory();
-            FragmentTransaction fragmentTransaction = dashboardFragManager.beginTransaction();
-            fragmentTransaction.replace(R.id.dashboardCategoryFragContainer, categoryFrag);
-            fragmentTransaction.addToBackStack("dashboard_stack");
-            fragmentTransaction.commit();
+            // delete from room database
+            mCategoryViewModel.deleteAll();
+            Toast.makeText(this, "Categories are removed successfully", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.option_delete_events) {
             SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -279,6 +276,24 @@ public class Dashboard extends AppCompatActivity {
             super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    /**
+     * Deprecated delete all categories function from shared preferences.
+     */
+    private void deleteAllCategories() {
+        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove(KeyStore.CATEGORY_LIST);
+        editor.apply();
+        Toast.makeText(this, "Categories are removed", Toast.LENGTH_SHORT).show();
+
+        // update fragment with new fragment
+        categoryFrag = new FragmentListCategory();
+        FragmentTransaction fragmentTransaction = dashboardFragManager.beginTransaction();
+        fragmentTransaction.replace(R.id.dashboardCategoryFragContainer, categoryFrag);
+        fragmentTransaction.addToBackStack("dashboard_stack");
+        fragmentTransaction.commit();
     }
 
     class MyNavigationListener implements NavigationView.OnNavigationItemSelectedListener {
