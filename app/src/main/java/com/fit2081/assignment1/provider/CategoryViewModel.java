@@ -28,6 +28,8 @@ public class CategoryViewModel extends AndroidViewModel {
     }
 
     public void incrementEventCount(String categoryId) { mRepository.incrementEventCount(categoryId);}
+
+    public void decrementEventCount(String categoryId) { mRepository.decrementEventCount(categoryId);}
     public void deleteAll(){
         mRepository.deleteAll();
     }

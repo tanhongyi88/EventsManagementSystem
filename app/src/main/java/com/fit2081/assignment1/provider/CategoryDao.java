@@ -21,6 +21,9 @@ public interface CategoryDao {
     @Query("update categories set eventCount = eventCount + 1 where categoryId=:categoryId")
     void incrementEventCount(String categoryId);
 
+    @Query("update categories set eventCount = eventCount - 1 where categoryId=:categoryId")
+    void decrementEventCount(String categoryId);
+
     @Query("delete from categories where categoryId=:categoryId")
     void deleteCategory(String categoryId);
 

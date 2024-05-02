@@ -22,6 +22,12 @@ public class EventRepository {
         EventDatabase.databaseWriteExecutor.execute(() -> mEventDao.addEvent(event));
     }
 
+    void delete(String eventId) {
+        EventDatabase.databaseWriteExecutor.execute(()->{
+            mEventDao.deleteEvent(eventId);
+        });
+    }
+
     void deleteAll(){
         EventDatabase.databaseWriteExecutor.execute(()->{
             mEventDao.deleteAllEvents();

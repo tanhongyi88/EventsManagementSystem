@@ -92,7 +92,7 @@ public class Dashboard extends AppCompatActivity {
                                 @Override
                                 public void onClick(View view) {
                                     undoNewEvent(newEvent);
-//                                    decrementEventCount(newEvent);
+                                    decrementEventCount(newEvent);
                                     Toast.makeText(Dashboard.this, "Undo successfully", Toast.LENGTH_SHORT).show();
                                 }
                             })
@@ -103,34 +103,42 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void decrementEventCount(Event eventAdded) {
-        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
-        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
-        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
-        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
-        for (Category c: categoryListRestored) {
-            if (c.getCategoryId().equals(eventAdded.getCategoryId())) {
-                c.decrementEventCount();
-                break;
-            }
-        }
-
-        String newCategoryListString = gson.toJson(categoryListRestored);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
-        editor.apply();
+        mCategoryViewModel.decrementEventCount(eventAdded.getCategoryId());
+        /**
+         * Deprecated decrement method
+         */
+//        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+//        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+//        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+//        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
+//        for (Category c: categoryListRestored) {
+//            if (c.getCategoryId().equals(eventAdded.getCategoryId())) {
+//                c.decrementEventCount();
+//                break;
+//            }
+//        }
+//
+//        String newCategoryListString = gson.toJson(categoryListRestored);
+//        SharedPreferences.Editor editor = sharedPref.edit();
+//        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
+//        editor.apply();
     }
 
-    private void undoNewEvent(Event newEventId) {
-        SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
-        String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
-        Type type = new TypeToken<ArrayList<Event>>() {}.getType();
-        ArrayList<Event> eventListRestored = gson.fromJson(eventListRestoredString,type);
-        eventListRestored.remove(eventListRestored.size()-1);
-
-        String newEventListString = gson.toJson(eventListRestored);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(KeyStore.EVENT_LIST, newEventListString);
-        editor.apply();
+    private void undoNewEvent(Event eventAdded) {
+        mEventViewModel.delete(eventAdded.getEventId());
+        /**
+         * Deprecated undo event method
+         */
+//        SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
+//        String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
+//        Type type = new TypeToken<ArrayList<Event>>() {}.getType();
+//        ArrayList<Event> eventListRestored = gson.fromJson(eventListRestoredString,type);
+//        eventListRestored.remove(eventListRestored.size()-1);
+//
+//        String newEventListString = gson.toJson(eventListRestored);
+//        SharedPreferences.Editor editor = sharedPref.edit();
+//        editor.putString(KeyStore.EVENT_LIST, newEventListString);
+//        editor.apply();
     }
 
     private void incrementEventCount(Event eventAdded) {
