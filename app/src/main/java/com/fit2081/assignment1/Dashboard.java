@@ -297,10 +297,7 @@ public class Dashboard extends AppCompatActivity {
             mCategoryViewModel.deleteAll();
             Toast.makeText(this, "Categories are removed successfully", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.option_delete_events) {
-            SharedPreferences sharedPref = getSharedPreferences(KeyStore.EVENT_FILE, MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.remove(KeyStore.EVENT_LIST);
-            editor.apply();
+            mEventViewModel.deleteAll();
             Toast.makeText(this, "Events are removed", Toast.LENGTH_SHORT).show();
         } else {
             super.onOptionsItemSelected(item);
