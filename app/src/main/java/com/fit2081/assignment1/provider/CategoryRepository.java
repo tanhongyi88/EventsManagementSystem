@@ -25,6 +25,10 @@ public class CategoryRepository {
         CategoryDatabase.databaseWriteExecutor.execute(() -> mCategoryDao.addCategory(category));
     }
 
+    void incrementEventCount(String categoryId) {
+        CategoryDatabase.databaseWriteExecutor.execute(() -> mCategoryDao.incrementEventCount(categoryId));
+    }
+
     void deleteAll(){
         CategoryDatabase.databaseWriteExecutor.execute(()->{
             mCategoryDao.deleteAllCategories();

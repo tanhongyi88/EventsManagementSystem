@@ -86,7 +86,7 @@ public class Dashboard extends AppCompatActivity {
             public void onClick(View view) {
                 if (isEventFormValid()) {
                     Event newEvent = addNewEvent();
-//                    incrementEventCount(newEvent);
+                    incrementEventCount(newEvent);
                     Snackbar.make(view, "New event saved", Snackbar.LENGTH_LONG)
                             .setAction("Undo", new View.OnClickListener() {
                                 @Override
@@ -134,21 +134,25 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void incrementEventCount(Event eventAdded) {
-        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
-        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
-        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
-        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
-        for (Category c: categoryListRestored) {
-            if (c.getCategoryId().equals(eventAdded.getCategoryId())) {
-                c.incrementEventCount();
-                break;
-            }
-        }
-
-        String newCategoryListString = gson.toJson(categoryListRestored);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
-        editor.apply();
+        mCategoryViewModel.incrementEventCount(eventAdded.getCategoryId());
+        /**
+         * Deprecated increment method
+         */
+//        SharedPreferences sharedPref = getSharedPreferences(KeyStore.CATEGORY_FILE, MODE_PRIVATE);
+//        String categoryListRestoredString = sharedPref.getString(KeyStore.CATEGORY_LIST, "[]");
+//        Type type = new TypeToken<ArrayList<Category>>() {}.getType();
+//        ArrayList<Category> categoryListRestored = gson.fromJson(categoryListRestoredString,type);
+//        for (Category c: categoryListRestored) {
+//            if (c.getCategoryId().equals(eventAdded.getCategoryId())) {
+//                c.incrementEventCount();
+//                break;
+//            }
+//        }
+//
+//        String newCategoryListString = gson.toJson(categoryListRestored);
+//        SharedPreferences.Editor editor = sharedPref.edit();
+//        editor.putString(KeyStore.CATEGORY_LIST, newCategoryListString);
+//        editor.apply();
     }
 
     private Event addNewEvent() {
