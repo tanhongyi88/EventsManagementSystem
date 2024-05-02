@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fit2081.assignment1.provider.CategoryViewModel;
 import com.fit2081.assignment1.provider.Event;
+import com.fit2081.assignment1.provider.EventViewModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,6 +37,7 @@ public class FragmentListEvent extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private EventViewModel mEventViewModel;
     ArrayList<Event> listEvent = new ArrayList<>();
     RecyclerAdapterEvent eventRecyclerAdapter;
     private RecyclerView eventRecyclerView;
@@ -82,10 +86,24 @@ public class FragmentListEvent extends Fragment {
         eventRecyclerView.setLayoutManager(eventLayoutManager);          // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
         eventRecyclerAdapter = new RecyclerAdapterEvent();
         eventRecyclerView.setAdapter(eventRecyclerAdapter);
-        getEventListFromPref(view);
+
+        // init view model and get event list data
+        mEventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
+        getEventListFromRoomDatabase();
         return view;
     }
 
+    private void getEventListFromRoomDatabase() {
+        mEventViewModel.getAllEvents().observe(getViewLifecycleOwner(), newData -> {
+            eventRecyclerAdapter.setEventList(new ArrayList<>(newData));
+            eventRecyclerAdapter.notifyDataSetChanged();
+        });
+    }
+
+    /**
+     * Deprecated get from shared preferences because room database is used on behalf
+     * @param view
+     */
     private void getEventListFromPref(View view) {
         SharedPreferences sharedPref = view.getContext().getSharedPreferences(KeyStore.EVENT_FILE, Context.MODE_PRIVATE);
         String eventListRestoredString = sharedPref.getString(KeyStore.EVENT_LIST, "[]");
