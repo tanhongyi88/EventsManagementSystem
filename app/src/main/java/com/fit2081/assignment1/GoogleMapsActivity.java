@@ -86,7 +86,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
         if (nameToAddressList != null && !nameToAddressList.isEmpty()) {
             mMap.addMarker(new MarkerOptions()
                     .position(locationOnMap)
-                    .title("This is " + nameToAddressList.get(0).getAddressLine(0)));
+                    .title("This is " + nameToAddressList.get(0).getCountryName()));
         } else {
             mMap.addMarker(new MarkerOptions()
                     .position(locationOnMap)
@@ -121,7 +121,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
                 else{
                     android.location.Address address = latlongToAddressList.get(0);
                     msg = "The address is " + address.getAddressLine(0);
-                    locationName = address.getAddressLine(0);
+                    locationName = address.getCountryName();
 
                     mMap.addMarker(new MarkerOptions().position(latLng).title(locationName));
                 }
