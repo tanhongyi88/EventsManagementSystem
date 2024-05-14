@@ -1,9 +1,11 @@
 package com.fit2081.assignment1;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,7 +43,7 @@ public class RecyclerAdapterCategory extends RecyclerView.Adapter<RecyclerAdapte
         return categoryList.size();
     }
 
-    public class CategoryItemViewHolder extends RecyclerView.ViewHolder {
+    public class CategoryItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView idView;
         public TextView nameView;
         public TextView eventCountView;
@@ -49,10 +51,20 @@ public class RecyclerAdapterCategory extends RecyclerView.Adapter<RecyclerAdapte
 
         public CategoryItemViewHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             idView = itemView.findViewById(R.id.category_item_id_view);
             nameView = itemView.findViewById(R.id.category_item_name_view);
             eventCountView = itemView.findViewById(R.id.category_item_event_count_view);
             isActiveView = itemView.findViewById(R.id.category_item_isactive_view);
+        }
+
+        @Override
+        public void onClick(View view) {
+            String locationName = categoryList.get(getLayoutPosition()).getLocation();
+            Intent mapIntent = new Intent(view.getContext(), GoogleMapsActivity.class);
+            mapIntent.putExtra("locationName", locationName);
+            Toast.makeText(view.getContext(), "Searching " + locationName +" using Google Maps...", Toast.LENGTH_SHORT).show();
+            view.getContext().startActivity(mapIntent);
         }
     }
 }

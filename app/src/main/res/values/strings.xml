@@ -3,4 +3,5 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_google_maps">GoogleMapsActivity</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDjosTzUUY1g1YemnR_E6b_DEpFifp494I</string>
 </resources>
