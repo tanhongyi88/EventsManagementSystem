@@ -106,6 +106,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
             @Override
             public void onMapClick(@NonNull LatLng latLng) {
                 String msg;
+                String locationName;
 
                 List<Address> latlongToAddressList = new ArrayList<>();
 
@@ -120,8 +121,9 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
                 else{
                     android.location.Address address = latlongToAddressList.get(0);
                     msg = "The address is " + address.getAddressLine(0);
+                    locationName = address.getAddressLine(0);
 
-                    mMap.addMarker(new MarkerOptions().position(latLng));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(locationName));
                 }
                 Snackbar.make(mapFragment.getView(), msg, Snackbar.LENGTH_LONG).show();
             }
