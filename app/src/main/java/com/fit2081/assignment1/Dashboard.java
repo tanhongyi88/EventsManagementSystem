@@ -1,6 +1,7 @@
 package com.fit2081.assignment1;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -11,12 +12,16 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.gesture.Gesture;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fit2081.assignment1.provider.Category;
@@ -44,10 +49,13 @@ public class Dashboard extends AppCompatActivity {
     EditText categoryIdView;
     EditText ticketsView;
     Switch isActiveView;
+    TextView gestureIndicatorText;
+    View touchPad;
     Gson gson = new Gson();
 
     private CategoryViewModel mCategoryViewModel;
     private EventViewModel mEventViewModel;
+    private GestureDetector mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +71,8 @@ public class Dashboard extends AppCompatActivity {
         categoryIdView = findViewById(R.id.dashboard_event_category_id_input);
         ticketsView = findViewById(R.id.dashboard_event_tickets_input);
         isActiveView = findViewById(R.id.dashboard_event_is_active_input);
+        touchPad = findViewById(R.id.touchPad);
+        gestureIndicatorText = findViewById(R.id.gestureIndicatorText);
 
 
         // set up toolbar and then drawer, nav view
@@ -98,6 +108,17 @@ public class Dashboard extends AppCompatActivity {
                             })
                             .show();
                 }
+            }
+        });
+
+        // setup gesture listener
+        MyGestureListener listener = new MyGestureListener();
+        mDetector = new GestureDetector(this, listener);
+        touchPad.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mDetector.onTouchEvent(motionEvent);
+                return true;
             }
         });
     }
@@ -350,5 +371,37 @@ public class Dashboard extends AppCompatActivity {
             // tell the OS
             return true;
         }
+    }
+
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public void onLongPress(@NonNull MotionEvent e) {
+            gestureIndicatorText.setText("OnLongPress!");
+            eventIdView.setText("");
+            eventNameView.setText("");
+            categoryIdView.setText("");
+            ticketsView.setText("");
+            isActiveView.setChecked(false);
+        }
+        @Override
+        public boolean onDoubleTap(@NonNull MotionEvent e) {
+            gestureIndicatorText.setText("OnDoubleTap!");
+            if (isEventFormValid()) {
+                Event newEvent = addNewEvent();
+                incrementEventCount(newEvent);
+                Snackbar.make(touchPad, "New event saved", Snackbar.LENGTH_LONG)
+                        .setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                undoNewEvent(newEvent);
+                                decrementEventCount(newEvent);
+                                Toast.makeText(Dashboard.this, "Undo successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .show();
+            }
+            return true;
+        }
+
     }
 }
